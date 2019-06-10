@@ -20,7 +20,7 @@ namespace MusicRnn
             {
                 console.Dispatcher.Invoke(() =>
                 {
-                    console.Text = (string)s;
+                    console.Text += "\n" + (string)s;
                 });
             };
 

@@ -19,6 +19,7 @@ namespace MusicRnn.ViewModels
         private List<MidiFile> _midiFiles;
         private IPythonService _service;
         private SoundPlayer _player;
+        private bool _isRunning;
 
         public event EventHandler UpdateView;
         public event EventHandler OutputUpdate;
@@ -30,7 +31,21 @@ namespace MusicRnn.ViewModels
         public IEnumerable<string> FilesNames { get => _midiFiles?.Select(p => p.Name); }
         public List<MidiFile> ResultFiles { get; set; }
         public Visibility ProgressVis { get; set; } = Visibility.Hidden;
-        public bool IsRunnig { get; set; }
+
+        public string ButtonText { get; set; } = "Start";
+
+        public bool IsRunnig
+        {
+            get => _isRunning;
+            set
+            {
+                _isRunning = value;
+                ButtonText = _isRunning ? "Stop" : "Start";
+
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ButtonText));
+            }
+        }
 
         public MainVM()
         {
@@ -91,6 +106,16 @@ namespace MusicRnn.ViewModels
 
         private void OnStartExecute(object obj)
         {
+            if (IsRunnig)
+            {
+                ProgressVis = Visibility.Hidden;
+                IsRunnig = false;
+
+                OnPropertyChanged(nameof(ProgressVis));
+                OnPropertyChanged(nameof(IsRunnig));
+                return;
+            }
+
             _service.StartScript();
 
             ProgressVis = Visibility.Visible;

@@ -10,6 +10,7 @@ namespace MusicRnn.Services
 {
     class PythonService : IPythonService
     {
+        private bool _isRunning = false;
         private Task _task;
         private Process _process;
 
@@ -21,6 +22,9 @@ namespace MusicRnn.Services
         public PythonService()
         {
             Result = new List<MidiFile>();
+
+            _isRunning = false;
+            _task = new Task(Start);
 
             _process = new Process();
             _process.StartInfo = new ProcessStartInfo($@"{AppDomain.CurrentDomain.BaseDirectory}script\Start.bat")
@@ -34,11 +38,14 @@ namespace MusicRnn.Services
 
         public void StartScript()
         {
-            if (_task != null)
-                _task.Dispose();
+            if (_isRunning)
+            {
+                _isRunning = false;
+                _process.Close();
+                return;
+            }
 
-            _task = new Task(Start);
-            
+            _isRunning = true;
             _task.Start();
         }
 
@@ -48,7 +55,7 @@ namespace MusicRnn.Services
 
             int count = 0;
             
-            while(true)
+            while(_isRunning)
             {
                 using (var reader = _process.StandardOutput)
                 {
@@ -66,7 +73,7 @@ namespace MusicRnn.Services
                         EpochResult?.Invoke(this, null);
                     }
                 }
-                Thread.Sleep(TimeSpan.FromMinutes(5));
+                Thread.Sleep(TimeSpan.FromMinutes(1));
             }
         }
     }

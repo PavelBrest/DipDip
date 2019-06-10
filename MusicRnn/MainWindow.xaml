@@ -10,7 +10,7 @@
 			<ColumnDefinition Width="3*"/>
 			<ColumnDefinition/>
 		</Grid.ColumnDefinitions>
-		<Button Content="Start"
+		<Button Content="{Binding ButtonText}"
 				Command="{Binding StartCommand}"
 				VerticalAlignment="Top"
 				Margin="5"/>
