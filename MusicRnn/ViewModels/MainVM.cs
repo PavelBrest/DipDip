@@ -21,6 +21,7 @@ namespace MusicRnn.ViewModels
         private SoundPlayer _player;
 
         public event EventHandler UpdateView;
+        public event EventHandler OutputUpdate;
 
         public IDelegateCommand LoadFilesCommand { get; private set; }
         public IDelegateCommand StartCommand { get; private set; }
@@ -40,6 +41,10 @@ namespace MusicRnn.ViewModels
             _midiFiles = new List<MidiFile>();
             _service = new PythonService();
             _service.EpochResult += EpochResult;
+            _service.ConsolePrint += (s, args) =>
+            {
+                OutputUpdate?.Invoke(s, args);
+            };
         }
 
         private void OnPlayExecute(object obj)
@@ -47,9 +52,17 @@ namespace MusicRnn.ViewModels
             if (obj is MidiFile file)
             {
                 _player?.Stop();
-                _player = new SoundPlayer(file.FullPath);
-                _player.Load();
-                _player.Play();
+                if (_player?.SoundLocation != file.FullPath)
+                {
+                    _player = new SoundPlayer(file.FullPath);
+                    _player.Load();
+                    _player.Play();
+                }
+                else
+                {
+                    _player?.Dispose();
+                    _player = null;
+                }
             }
         }
 

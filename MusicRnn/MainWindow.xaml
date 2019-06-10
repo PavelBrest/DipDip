@@ -12,41 +12,58 @@
 		</Grid.ColumnDefinitions>
 		<Button Content="Start"
 				Command="{Binding StartCommand}"
-				IsEnabled="{Binding IsRunnig}"
 				VerticalAlignment="Top"
 				Margin="5"/>
 
-		<ScrollViewer Margin="5,35,5,5"
-					  VerticalScrollBarVisibility="Auto">
-			<StackPanel>
-				<ListBox BorderThickness="0"
+		<Grid Margin="5,35,5,5">
+			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition Height="150"/>
+			</Grid.RowDefinitions>
+			
+			<ScrollViewer VerticalScrollBarVisibility="Auto">
+				<StackPanel>
+					<ListBox BorderThickness="0"
 						 ScrollViewer.CanContentScroll="False"
 						 x:Name="listView">
-					<ListBox.ItemTemplate>
-						<DataTemplate>
-							<Grid Margin="0,2">
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="50" />
-									<ColumnDefinition Width="*" />
-								</Grid.ColumnDefinitions>
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+								<Grid Margin="0,2">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="50" />
+										<ColumnDefinition Width="*" />
+									</Grid.ColumnDefinitions>
 
-								<Button Content="Play"
+									<Button Content="Play"
 										Command="{Binding PlayCommand}"
 										CommandParameter="{Binding ElementName=listView, Source=SelectedItem}"/>
-								<TextBlock Grid.Column="1" 
+									<TextBlock Grid.Column="1" 
 										   VerticalAlignment="Center"
 										   Margin="20,0"
 										   Text="{Binding Name}"/>
-							</Grid>
-						</DataTemplate>
-					</ListBox.ItemTemplate>
-				</ListBox>
-				<ProgressBar Height="20"
+								</Grid>
+							</DataTemplate>
+						</ListBox.ItemTemplate>
+					</ListBox>
+					<ProgressBar Height="20"
 							 x:Name="progBar"
 							 IsIndeterminate="True"
 							 Visibility="{Binding ProgressVis}"/>
-			</StackPanel>
-		</ScrollViewer>
+				</StackPanel>
+			</ScrollViewer>
+
+			<Border Grid.Row="1"
+					Margin="5"
+					BorderBrush="LightGray"
+					Padding="5"
+					BorderThickness="1">
+				<TextBlock x:Name="console"  
+					   ScrollViewer.VerticalScrollBarVisibility="Auto"
+					   Foreground="Gray"
+					   Text="test"/>
+			</Border>
+		</Grid>
+		
 		
 		<Grid Grid.Column="1">
 			<ListBox Grid.Column="1"

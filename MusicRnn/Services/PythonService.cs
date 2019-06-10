@@ -16,6 +16,7 @@ namespace MusicRnn.Services
         public List<MidiFile> Result { get; private set; }
 
         public event EventHandler EpochResult;
+        public event EventHandler ConsolePrint;
 
         public PythonService()
         {
@@ -25,8 +26,9 @@ namespace MusicRnn.Services
             _process.StartInfo = new ProcessStartInfo($@"{AppDomain.CurrentDomain.BaseDirectory}script\Start.bat")
             {
                 UseShellExecute = false,
-                CreateNoWindow = true,
-                WorkingDirectory = $@"{AppDomain.CurrentDomain.BaseDirectory}script"
+                CreateNoWindow = false,
+                WorkingDirectory = $@"{AppDomain.CurrentDomain.BaseDirectory}script",
+                RedirectStandardOutput = true
             };
         }
 
@@ -48,12 +50,21 @@ namespace MusicRnn.Services
             
             while(true)
             {
-                var files = Directory.GetFiles($@"{AppDomain.CurrentDomain.BaseDirectory}script\output");
-                
-                if (count != files.Length)
+                using (var reader = _process.StandardOutput)
                 {
-                    count = files.Length;
-                    EpochResult?.Invoke(this, null);
+                    var files = Directory.GetFiles($@"{AppDomain.CurrentDomain.BaseDirectory}script\output");
+
+                    while(!reader.EndOfStream)
+                    {
+                        ConsolePrint?.Invoke(reader.ReadLine(), null);
+                    }
+
+
+                    if (count != files.Length)
+                    {
+                        count = files.Length;
+                        EpochResult?.Invoke(this, null);
+                    }
                 }
                 Thread.Sleep(TimeSpan.FromMinutes(5));
             }
@@ -63,7 +74,8 @@ namespace MusicRnn.Services
     internal interface IPythonService
     {
         event EventHandler EpochResult;
-        
+        event EventHandler ConsolePrint;
+
         List<MidiFile> Result { get; }
         void StartScript();
     }
